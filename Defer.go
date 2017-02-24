@@ -11,7 +11,15 @@ func main() {
 	// defer fmt.Println(2)
 
 	// a()
-	fmt.Println(b(1, "2"))
+	// fmt.Println(b(1, "2"))
+
+	var test int
+	test = 1
+	defer fmt.Println("第一个defer")
+	if test == 2 {
+		return
+	}
+	defer fmt.Println("第二个defer")
 }
 
 func a() {
