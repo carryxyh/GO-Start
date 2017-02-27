@@ -10,5 +10,5 @@ func main() {
 		fmt.Println(szbc[i])
 	}
 	//这里会报错，虽然是可变长的数组但是数组长度还是固定值
-	fmt.Println(szbc[2])
+	fmt.Println(szbc[0])
 }
