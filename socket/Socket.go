@@ -12,6 +12,7 @@ func main() {
 		os.Exit(1)
 	}
 	name := os.Args[1]
+	fmt.Println(name)
 	addr := net.ParseIP(name)
 	if addr == nil {
 		fmt.Println("Invalid address")
