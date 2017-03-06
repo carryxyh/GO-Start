@@ -7,8 +7,9 @@ import (
 	"time"
 )
 
+//UDP缺少了对客户端连接请求的Accept函数
 func main() {
-	service := ":1200"
+	service := ":7777"
 	udpAddr, err := net.ResolveUDPAddr("udp4", service)
 	checkError(err)
 	conn, err := net.ListenUDP("udp", udpAddr)
