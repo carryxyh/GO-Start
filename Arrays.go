@@ -1,6 +1,10 @@
 package main
 
 import "fmt"
+import (
+	"strings"
+	"time"
+)
 
 func main() {
 	// var sz [10]int
@@ -11,4 +15,6 @@ func main() {
 	}
 	//这里会报错，虽然是可变长的数组但是数组长度还是固定值
 	fmt.Println(szbc[0])
+
+	fmt.Println(time.Now().String()[:strings.LastIndex(time.Now().String(), "+")-11])
 }

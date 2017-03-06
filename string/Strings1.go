@@ -5,6 +5,10 @@ import (
 	"strings"
 )
 
+type Args struct {
+	A, B int
+}
+
 func main() {
 	fmt.Println(strings.Contains("seafood", "od"))
 	fmt.Println(strings.Count("abdab", "ab"))
@@ -38,4 +42,11 @@ func main() {
 
 	//去除s字符串的空格符，并且按照空格分割返回slice
 	fmt.Println(strings.Fields("zi yuan shi wu liang "))
+
+	//指针
+	args1 := new(Args)
+	fmt.Println(args1)
+
+	args := Args{2, 3}
+	fmt.Println(args)
 }

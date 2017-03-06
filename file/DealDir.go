@@ -11,5 +11,5 @@ func main() {
 	if err != nil {
 		//ignore
 	}
-	os.RemoveAll("./test")
+	// os.RemoveAll("./test")
 }
