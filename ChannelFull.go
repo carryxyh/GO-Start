@@ -21,6 +21,19 @@ func main() {
 	fmt.Println(<-messages)
 	// fmt.Println(<-messages)
 	// fmt.Println(<-messages)
+
+	bus := make(chan int)
+
+	go func() {
+		for coun := range bus {
+			fmt.Println(coun)
+		}
+	}()
+
+	for i := 0; i < 10; i++ {
+		bus <- i
+	}
+
 }
 
 // func main() {
