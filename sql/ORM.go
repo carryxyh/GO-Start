@@ -45,6 +45,14 @@ func main() {
 	//删除
 	num, err = orm.Delete(&u)
 	fmt.Printf("NUM: %d, ERR: %v\n", num, err)
+
+	var users []*User
+	q := orm.QueryTable("user")
+	q.All(&users)
+	for _, u := range users {
+		fmt.Println("id ", u.Id)
+		fmt.Println("name ", u.Name)
+	}
 }
 
 // Model Struct
