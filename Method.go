@@ -2,6 +2,7 @@
 package main
 
 import "fmt"
+import "os"
 
 type Circle struct {
 	radius float64
@@ -17,4 +18,5 @@ func main() {
 	var c1 Circle
 	c1.radius = 10.00
 	fmt.Println("Area of Circle(c1) = ", c1.getArea())
+	fmt.Println(os.Getenv("JAVA_HOME"))
 }
