@@ -10,4 +10,15 @@ func main() {
 	} else {
 		fmt.Println(num, "has multiple digits")
 	}
+
+	//编译并不报错，运行时报错
+	s := "txt"
+	if s {
+		fmt.Println("true")
+	}
+
+	//编译并不报错，运行时报错
+	if nil {
+		fmt.Println("nil true")
+	}
 }
