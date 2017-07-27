@@ -18,6 +18,6 @@ func main() {
 	fmt.Println(<-channel)
 
 	//这里仍然报错，why？！
-	msg1 := <-channel
-	fmt.Println(msg1)
+	// msg1 := <-channel
+	// fmt.Println(msg1)
 }
