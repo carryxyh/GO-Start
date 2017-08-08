@@ -1,0 +1,640 @@
+
+2016年05月03日
+gin是go语言环境下的一个web框架, 它类似于Martini, 官方声称它比Martini有更好的性能, 比Martini快40倍, Ohhhh....看着不错的样子, 所以就想记录一下gin的学习. gin的github代码在这里: gin源码. gin的效率获得如此突飞猛进, 得益于另一个开源项目httprouter, 项目地址: httprouter源码. 下面主要记录一下gin的使用.
+
+
+
+1. 安装gin
+
+使用命令go get github.com/gin-gonic/gin就可以. 我们使用gin的时候引入相应的包就OKimport "github.com/gin-gonic/gin".
+
+
+
+2. 使用方法
+
+<1> 一种最简单的使用GET/POST方法
+
+gin服务端代码是:
+
+// func1: 处理最基本的GET
+func func1 (c *gin.Context)  {
+    // 回复一个200OK,在client的http-get的resp的body中获取数据
+    c.String(http.StatusOK, "test1 OK")
+}
+// func2: 处理最基本的POST
+func func2 (c *gin.Context) {
+    // 回复一个200 OK, 在client的http-post的resp的body中获取数据
+    c.String(http.StatusOK, "test2 OK")
+}
+func main(){
+    // 注册一个默认的路由器
+    router := gin.Default()
+    // 最基本的用法
+    router.GET("/test1", func1)
+    router.POST("/test2", func2)
+    // 绑定端口是8888
+    router.Run(":8888")
+}
+客户端代码是:
+
+func main(){
+    // 调用最基本的GET,并获得返回值
+    resp,_ := http.Get("http://0.0.0.0:8888/test1")
+    helpRead(resp)
+
+    // 调用最基本的POST,并获得返回值
+    resp,_ = http.Post("http://0.0.0.0:8888/test2", "",strings.NewReader(""))
+    helpRead(resp)
+}
+在服务端, 实例化了一个router, 然后使用GET和POST方法分别注册了两个服务, 当我们使用HTTP GET方法的时候会使用GET注册的函数, 如果使用HTTP POST的方法, 那么会使用POST注册的函数. gin支持所有的HTTP的方法例如: GET, POST, PUT, PATCH, DELETE 和 OPTIONS等. 看客户端中的代码, 当调用http.Get("http://0.0.0.0:8888/test1")的时候, 服务端接收到请求, 并根据/test1将请求路由到func1函数进行 处理. 同理, 调用http.Post("http://0.0.0.0:8888/test2", "",strings.NewReader(""))时候, 会使用func2函数处理. 在func1和func2中, 使用gin.Context填充了一个String的回复. 当然也支持JSON, XML, HTML等其他一些格式数据. 当执行c.String或者c.JSON时, 相当于向http的回复缓冲区写入了 一些数据. 最后调用router.Run(":8888")开始进行监听,Run的核心代码是:
+
+func (engine *Engine) Run(addr string) (err error) {
+    debugPrint("Listening and serving HTTP on %s\n", addr)
+    defer func() { debugPrintError(err) }()
+    // 核心代码
+    err = http.ListenAndServe(addr, engine)
+    return
+}
+其本质就是http.ListenAndServe(addr, engine). 
+注意: helpRead函数是用于读取response的Body的函数, 你可以自己定义, 本文中此函数定义为:
+
+// 用于读取resp的body
+func helpRead(resp *http.Response)  {
+    defer resp.Body.Close()
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        fmt.Println("ERROR2!: ", err)
+    }
+    fmt.Println(string(body))
+}
+
+
+<2> 传递参数
+
+传递参数有几种方法, 对应到gin使用几种不同的方式来解析.
+
+第一种: 使用gin.Context中的Param方法解析
+
+对应的服务端代码为:
+
+// func3: 处理带参数的path-GET
+func func3(c *gin.Context)  {
+    // 回复一个200 OK
+    // 获取传入的参数
+    name := c.Param("name")
+    passwd := c.Param("passwd")
+    c.String(http.StatusOK, "参数:%s %s  test3 OK", name, passwd)
+}
+// func4: 处理带参数的path-POST
+func func4(c *gin.Context)  {
+    // 回复一个200 OK
+    // 获取传入的参数
+    name := c.Param("name")
+    passwd := c.Param("passwd")
+    c.String(http.StatusOK, "参数:%s %s  test4 OK", name, passwd)
+}
+// func5: 注意':'和'*'的区别
+func func5(c *gin.Context)  {
+    // 回复一个200 OK
+    // 获取传入的参数
+    name := c.Param("name")
+    passwd := c.Param("passwd")
+    c.String(http.StatusOK, "参数:%s %s  test5 OK", name, passwd)
+}
+
+func main(){
+    router := gin.Default()
+    // TODO:注意':'必须要匹配,'*'选择匹配,即存在就匹配,否则可以不考虑
+    router.GET("/test3/:name/:passwd", func3)
+    router.POST("/test4/:name/:passwd", func4)
+    router.GET("/test5/:name/*passwd", func5)
+
+    router.Run(":8888")
+}
+客户端测试代码是:
+
+func main() {
+    // GET传参数,使用gin的Param解析格式: /test3/:name/:passwd
+    resp,_ = http.Get("http://0.0.0.0:8888/test3/name=TAO/passwd=123")
+    helpRead(resp)
+
+    // POST传参数,使用gin的Param解析格式: /test3/:name/:passwd
+    resp,_ = http.Post("http://0.0.0.0:8888/test4/name=PT/passwd=456", "",strings.NewReader(""))
+    helpRead(resp)
+
+    // 注意Param中':'和'*'的区别
+    resp,_ = http.Get("http://0.0.0.0:8888/test5/name=TAO/passwd=789")
+    helpRead(resp)
+    resp,_ = http.Get("http://0.0.0.0:8888/test5/name=TAO/")
+    helpRead(resp)
+}
+注意上面定义参数的方法有两个辅助符号: ':'和'*'. 如果使用':'参数方法, 那么这个参数是必须要匹配的, 例如上面的router.GET("/test3/:name/:passwd", func3), 当请求URL是 类似于http://0.0.0.0:8888/test3/name=TAO/passwd=123这样的参会被匹配, 如果是http://0.0.0.0:8888/test3/name=TAO 或者http://0.0.0.0:8888/test3/passwd=123是不能匹配的. 但是如果使用'*'参数, 那么这个参数是可选的. router.GET("/test5/:name/*passwd", func5) 可以匹配http://0.0.0.0:8888/test5/name=TAO/passwd=789, 也可以匹配http://0.0.0.0:8888/test5/name=TAO/. 需要注意的一点是, 下面这个URL是不是能够 匹配呢? http://0.0.0.0:8888/test5/name=TAO, 注意TAO后面没有'/', 这个其实就要看有没有一个路由是到http://0.0.0.0:8888/test5/name=TAO路径的, 如果有, 那么指定的那个函数进行处理, 如果没有http://0.0.0.0:8888/test5/name=TAO会被重定向到http://0.0.0.0:8888/test5/name=TAO/, 然后被当前注册的函数进行处理.
+
+
+
+第二种: 使用gin.Context中的Query方法解析
+
+这个类似于正常的URL中的参数传递, 先看服务端代码:
+
+// 使用Query获取参数
+func func6(c *gin.Context)  {
+    // 回复一个200 OK
+    // 获取传入的参数
+    name := c.Query("name")
+    passwd := c.Query("passwd")
+    c.String(http.StatusOK, "参数:%s %s  test6 OK", name, passwd)
+}
+// 使用Query获取参数
+func func7(c *gin.Context)  {
+    // 回复一个200 OK
+    // 获取传入的参数
+    name := c.Query("name")
+    passwd := c.Query("passwd")
+    c.String(http.StatusOK, "参数:%s %s  test7 OK", name, passwd)
+}
+
+func main(){
+    router := gin.Default()
+    // 使用gin的Query参数形式,/test6?firstname=Jane&lastname=Doe
+    router.GET("/test6", func6)
+    router.POST("/test7", func7)
+
+    router.Run(":8888")
+}
+
+客户端测试代码是:
+
+func main() {
+    // 使用Query获取参数形式/test6?firstname=Jane&lastname=Doe
+    resp,_ = http.Get("http://0.0.0.0:8888/test6?name=BBB&passwd=CCC")
+    helpRead(resp)
+    resp,_ = http.Post("http://0.0.0.0:8888/test7?name=DDD&passwd=EEE", "",strings.NewReader(""))
+    helpRead(resp)
+}
+这种方法的参数也是接在URL后面, 形如http://0.0.0.0:8888/test6?name=BBB&passwd=CCC. 服务器可以使用name := c.Query("name")这种 方法来解析参数.
+
+
+
+第三种: 使用gin.Context中的PostForm方法解析
+
+我们需要将参数放在请求的Body中传递, 而不是URL中. 先看服务端代码:
+
+// 参数是form中获得,即从Body中获得,忽略URL中的参数
+func func8(c *gin.Context)  {
+    message := c.PostForm("message")
+    extra := c.PostForm("extra")
+    nick := c.DefaultPostForm("nick", "anonymous")
+
+    c.JSON(200, gin.H{
+        "status":  "test8:posted",
+        "message": message,
+        "nick":    nick,
+        "extra": extra,
+    })
+}
+
+func main(){
+    router := gin.Default()
+    // 使用post_form形式,注意必须要设置Post的type,
+    // 同时此方法中忽略URL中带的参数,所有的参数需要从Body中获得
+    router.POST("/test8", func8)
+
+    router.Run(":8888")
+}
+客户端代码是:
+
+func main() {
+    // 使用post_form形式,注意必须要设置Post的type,同时此方法中忽略URL中带的参数,所有的参数需要从Body中获得
+    resp,_ = http.Post("http://0.0.0.0:8888/test8", "application/x-www-form-urlencoded",strings.NewReader("message=8888888&extra=999999"))
+    helpRead(resp)
+}
+由于我们使用了request Body, 那么就需要指定Body中数据的形式, 此处是form格式, 即application/x-www-form-urlencoded. 常见的几种http提交数据方式有: application/x-www-form-urlencoded; multipart/form-data; application/json; text/xml. 具体使用请google.
+在服务端, 使用message := c.PostForm("message")方法解析参数, 然后进行处理.
+
+
+
+<3> 传输文件
+
+下面测试从client传输文件到server. 传输文件需要使用multipart/form-data格式的数据, 所有需要设定Post的类型是multipart/form-data. 
+首先看服务端代码:
+
+// 接收client上传的文件
+// 从FormFile中获取相关的文件data!
+// 然后写入本地文件
+func func9(c *gin.Context) {
+    // 注意此处的文件名和client处的应该是一样的
+    file, header , err := c.Request.FormFile("uploadFile")
+    filename := header.Filename
+    fmt.Println(header.Filename)
+    // 创建临时接收文件
+    out, err := os.Create("copy_"+filename)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer out.Close()
+    // Copy数据
+    _, err = io.Copy(out, file)
+    if err != nil {
+        log.Fatal(err)
+    }
+    c.String(http.StatusOK, "upload file success")
+}
+
+func main(){
+    router := gin.Default()
+    // 接收上传的文件,需要使用
+    router.POST("/upload", func9)
+
+    router.Run(":8888")
+}
+客户端代码是:
+
+func main() {
+    // 上传文件POST
+    // 下面构造一个文件buf作为POST的BODY
+    buf := new(bytes.Buffer)
+    w := multipart.NewWriter(buf)
+    fw,_ := w.CreateFormFile("uploadFile", "images.png") //这里的uploadFile必须和服务器端的FormFile-name一致
+    fd,_ := os.Open("images.png")
+    defer fd.Close()
+    io.Copy(fw, fd)
+    w.Close()
+    resp,_ = http.Post("http://0.0.0.0:8888/upload", w.FormDataContentType(), buf)
+    helpRead(resp)
+}
+首先客户端本地需要有一张"images.png"图片, 同时需要创建一个Form, 并将field-name命名为"uploadFile", file-name命名为"images.png". 在服务端, 通过"uploadFile"可以得到文件信息. 客户端继续将图片数据copy到创建好的Form中, 将数据数据Post出去, 注意数据的类型指定! 在服务端, 通过file, header , err := c.Request.FormFile("uploadFile")获得文件信息, file中就是文件数据, 将其拷贝到本地文件, 完成文件传输.
+
+
+
+<4> binding数据
+
+gin内置了几种数据的绑定例如JSON, XML等. 简单来说, 即根据Body数据类型, 将数据赋值到指定的结构体变量中. (类似于序列化和反序列化) 
+看服务端代码:
+
+// Binding数据
+// 注意:后面的form:user表示在form中这个字段是user,不是User, 同样json:user也是
+// 注意:binding:"required"要求这个字段在client端发送的时候必须存在,否则报错!
+type Login struct {
+    User     string `form:"user" json:"user" binding:"required"`
+    Password string `form:"password" json:"password" binding:"required"`
+}
+// bind JSON数据
+func funcBindJSON(c *gin.Context) {
+    var json Login
+    // binding JSON,本质是将request中的Body中的数据按照JSON格式解析到json变量中
+    if c.BindJSON(&json) == nil {
+        if json.User == "TAO" && json.Password == "123" {
+            c.JSON(http.StatusOK, gin.H{"JSON=== status": "you are logged in"})
+        } else {
+            c.JSON(http.StatusUnauthorized, gin.H{"JSON=== status": "unauthorized"})
+        }
+    } else {
+        c.JSON(404, gin.H{"JSON=== status": "binding JSON error!"})
+    }
+}
+
+// 下面测试bind FORM数据
+func funcBindForm(c *gin.Context) {
+    var form Login
+    // 本质是将c中的request中的BODY数据解析到form中
+
+    // 方法一: 对于FORM数据直接使用Bind函数, 默认使用使用form格式解析,if c.Bind(&form) == nil
+    // 方法二: 使用BindWith函数,如果你明确知道数据的类型
+    if c.BindWith(&form, binding.Form) == nil{
+        if form.User == "TAO" && form.Password == "123" {
+            c.JSON(http.StatusOK, gin.H{"FORM=== status": "you are logged in"})
+        } else {
+            c.JSON(http.StatusUnauthorized, gin.H{"FORM=== status": "unauthorized"})
+        }
+    } else {
+        c.JSON(404, gin.H{"FORM=== status": "binding FORM error!"})
+    }
+}
+
+func main(){
+    router := gin.Default()
+    // 下面测试bind JSON数据
+    router.POST("/bindJSON", funcBindJSON)
+
+    // 下面测试bind FORM数据
+    router.POST("/bindForm", funcBindForm)
+
+    // 下面测试JSON,XML等格式的rendering
+    router.GET("/someJSON", func(c *gin.Context) {
+        c.JSON(http.StatusOK, gin.H{"message": "hey, budy", "status": http.StatusOK})
+    })
+
+    router.GET("/moreJSON", func(c *gin.Context) {
+        // 注意:这里定义了tag指示在json中显示的是user不是User
+        var msg struct {
+            Name    string `json:"user"`
+            Message string
+            Number  int
+        }
+        msg.Name = "TAO"
+        msg.Message = "hey, budy"
+        msg.Number = 123
+        // 下面的在client的显示是"user": "TAO",不是"User": "TAO"
+        // 所以总体的显示是:{"user": "TAO", "Message": "hey, budy", "Number": 123
+        c.JSON(http.StatusOK, msg)
+    })
+
+    //  测试发送XML数据
+    router.GET("/someXML", func(c *gin.Context) {
+        c.XML(http.StatusOK, gin.H{"name":"TAO", "message": "hey, budy", "status": http.StatusOK})
+    })
+
+    router.Run(":8888")
+}
+客户端代码:
+
+func main() {
+    // 下面测试binding数据
+    // 首先测试binding-JSON,
+    // 注意Body中的数据必须是JSON格式
+    resp,_ = http.Post("http://0.0.0.0:8888/bindJSON", "application/json", strings.NewReader("{\"user\":\"TAO\", \"password\": \"123\"}"))
+    helpRead(resp)
+
+    // 下面测试bind FORM数据
+    resp,_ = http.Post("http://0.0.0.0:8888/bindForm", "application/x-www-form-urlencoded", strings.NewReader("user=TAO&password=123"))
+    helpRead(resp)
+
+    // 下面测试接收JSON和XML数据
+    resp,_ = http.Get("http://0.0.0.0:8888/someJSON")
+    helpRead(resp)
+    resp,_ = http.Get("http://0.0.0.0:8888/moreJSON")
+    helpRead(resp)
+    resp,_ = http.Get("http://0.0.0.0:8888/someXML")
+    helpRead(resp)
+}
+客户端发送请求, 在服务端可以直接使用c.BindJSON绑定到Json结构体上. 或者使用BindWith函数也可以, 但是需要指定绑定的数据类型, 例如JSON, XML, HTML等. Bind*函数的本质是读取request中的body数据, 拿BindJSON为例, 其核心代码是:
+
+func (_ jsonBinding) Bind(req *http.Request, obj interface{}) error {
+    // 核心代码: decode请求的body到obj中
+    decoder := json.NewDecoder(req.Body)
+    if err := decoder.Decode(obj); err != nil {
+        return err
+    }
+    return validate(obj)
+}
+
+
+<5> router group
+
+router group是为了方便前缀相同的URL的管理, 其基本用法如下. 
+首先看服务端代码:
+
+// router GROUP - GET测试
+func func10(c *gin.Context)  {
+    c.String(http.StatusOK, "test10 OK")
+}
+func func11(c *gin.Context)  {
+    c.String(http.StatusOK, "test11 OK")
+}
+
+// router GROUP - POST测试
+func func12(c *gin.Context)  {
+    c.String(http.StatusOK, "test12 OK")
+}
+func func13(c *gin.Context)  {
+    c.String(http.StatusOK, "test13 OK")
+}
+
+func main(){
+    router := gin.Default()
+    // router Group是为了将一些前缀相同的URL请求放在一起管理
+    group1 := router.Group("/g1")
+    group1.GET("/read1", func10)
+    group1.GET("/read2", func11)
+
+    group2 := router.Group("/g2")
+    group2.POST("/write1", func12)
+    group2.POST("/write2", func13)
+
+    router.Run(":8888")
+}
+客户端测试代码:
+
+func main() {
+    // 下面测试router 的GROUP
+    resp,_ = http.Get("http://0.0.0.0:8888/g1/read1")
+    helpRead(resp)
+    resp,_ = http.Get("http://0.0.0.0:8888/g1/read2")
+    helpRead(resp)
+    resp,_ = http.Post("http://0.0.0.0:8888/g2/write1", "", strings.NewReader(""))
+    helpRead(resp)
+    resp,_ = http.Post("http://0.0.0.0:8888/g2/write2", "", strings.NewReader(""))
+    helpRead(resp)
+}
+在服务端代码中, 首先创建了一个组group1 := router.Group("/g1"), 并在这个组下注册了两个服务, group1.GET("/read1", func10) 和group1.GET("/read2", func11), 那么当使用http://0.0.0.0:8888/g1/read1和http://0.0.0.0:8888/g1/read2访问时, 是可以路由 到上面注册的位置的. 同理对于group2 := router.Group("/g2")也是一样的.
+
+
+
+<6> 静态文件服务
+
+可以向客户端展示本地的一些文件信息, 例如显示某路径下地文件. 服务端代码是:
+
+func main(){
+    router := gin.Default()
+    // 下面测试静态文件服务
+    // 显示当前文件夹下的所有文件/或者指定文件
+    router.StaticFS("/showDir", http.Dir("."))
+    router.Static("/files", "/bin")
+    router.StaticFile("/image", "./assets/1.png")
+
+    router.Run(":8888")
+}
+首先你需要在服务器的路径下创建一个assert文件夹, 并且放入1.png文件. 如果已经存在, 请忽略. 
+测试代码: 请在浏览器中输入0.0.0.0:8888/showDir, 显示的是服务器当前路径下地文件信息:
+
+1
+
+输入0.0.0.0:8888/files, 显示的是/bin目录下地文件信息:
+
+2
+
+输入0.0.0.0:8888/image, 显示的是服务器下地./assets/1.png图片:
+
+3
+
+
+
+<7> 加载模板templates
+
+gin支持加载HTML模板, 然后根据模板参数进行配置并返回相应的数据. 
+看服务端代码
+
+func main(){
+    router := gin.Default()
+    // 下面测试加载HTML: LoadHTMLTemplates
+    // 加载templates文件夹下所有的文件
+    router.LoadHTMLGlob("templates/*")
+    // 或者使用这种方法加载也是OK的: router.LoadHTMLFiles("templates/template1.html", "templates/template2.html")
+    router.GET("/index", func(c *gin.Context) {
+        // 注意下面将gin.H参数传入index.tmpl中!也就是使用的是index.tmpl模板
+        c.HTML(http.StatusOK, "index.tmpl", gin.H{
+            "title": "GIN: 测试加载HTML模板",
+        })
+    })
+
+    router.Run(":8888")
+}
+客户端测试代码是:
+
+func main() {
+    // 测试加载HTML模板
+    resp,_ = http.Get("http://0.0.0.0:8888/index")
+    helpRead(resp)
+}
+在服务端, 我们需要加载需要的templates, 这里有两种方法: 第一种使用LoadHTMLGlob加载所有的正则匹配的模板, 本例中使用的是*, 即匹配所有文件, 所以加载的是 templates文件夹下所有的模板. 第二种使用LoadHTMLFiles加载指定文件. 在本例服务器路径下有一个templates目录, 下面有一个index.tmpl模板, 模板的 内容是:
+
+<html>
+    <h1>
+       { { .title } }
+    </h1>
+</html>
+当客户端请求/index时, 服务器使用这个模板, 并填充相应的参数, 此处参数只有title, 然后将HTML数据返回给客户端. 
+你也可以在浏览器请求0.0.0.0:8888/index, 效果如下图所示:
+
+4
+
+
+
+<8> 重定向
+
+重定向相对比较简单, 服务端代码是:
+
+func main(){
+    router := gin.Default()
+    // 下面测试重定向
+    router.GET("/redirect", func(c *gin.Context) {
+        c.Redirect(http.StatusMovedPermanently, "http://shanshanpt.github.io/")
+    })
+
+    router.Run(":8888")
+}
+客户端测试代码是:
+
+func main() {
+    // 下面测试重定向
+    resp,_ = http.Get("http://0.0.0.0:8888/redirect")
+    helpRead(resp)
+}
+当我们请求http://0.0.0.0:8888/redirect的时候, 会重定向到http://shanshanpt.github.io/这个站点.
+
+
+
+<9> 使用middleware
+
+这里使用了两个例子, 一个是logger, 另一个是BasiAuth, 具体看服务器代码:
+
+func Logger() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        t := time.Now()
+        // 设置example变量到Context的Key中,通过Get等函数可以取得
+        c.Set("example", "12345")
+        // 发送request之前
+        c.Next()
+        // 发送request之后
+        latency := time.Since(t)
+        log.Print(latency)
+
+        // 这个c.Write是ResponseWriter,我们可以获得状态等信息
+        status := c.Writer.Status()
+        log.Println(status)
+    }
+}
+
+
+func main(){
+    router := gin.Default()
+    // 1
+    router.Use(Logger())
+    router.GET("/logger", func(c *gin.Context) {
+        example := c.MustGet("example").(string)
+        log.Println(example)
+    })
+
+    // 2
+    // 下面测试BasicAuth()中间件登录认证
+    //
+    var secrets = gin.H{
+        "foo":    gin.H{"email": "foo@bar.com", "phone": "123433"},
+        "austin": gin.H{"email": "austin@example.com", "phone": "666"},
+        "lena":   gin.H{"email": "lena@guapa.com", "phone": "523443"},
+    }
+    // Group using gin.BasicAuth() middleware
+    // gin.Accounts is a shortcut for map[string]string
+    authorized := router.Group("/admin", gin.BasicAuth(gin.Accounts{
+        "foo":    "bar",
+        "austin": "1234",
+        "lena":   "hello2",
+        "manu":   "4321",
+    }))
+    // 请求URL: 0.0.0.0:8888/admin/secrets
+    authorized.GET("/secrets", func(c *gin.Context) {
+        // get user, it was set by the BasicAuth middleware
+        user := c.MustGet(gin.AuthUserKey).(string)
+        if secret, ok := secrets[user]; ok {
+            c.JSON(http.StatusOK, gin.H{"user": user, "secret": secret})
+        } else {
+            c.JSON(http.StatusOK, gin.H{"user": user, "secret": "NO SECRET :("})
+        }
+    })
+
+    router.Run(":8888")
+}
+客户端测试代码是:
+
+func main() {
+    // 下面测试使用中间件
+    resp,_ = http.Get("http://0.0.0.0:8888/logger")
+    helpRead(resp)
+
+    // 测试验证权限中间件BasicAuth
+    resp,_ = http.Get("http://0.0.0.0:8888/admin/secrets")
+    helpRead(resp)
+}
+服务端使用Use方法导入middleware, 当请求/logger来到的时候, 会执行Logger(), 并且我们知道在GET注册的时候, 同时注册了匿名函数, 所有请看Logger函数中存在一个c.Next()的用法, 它是取出所有的注册的函数都执行一遍, 然后再回到本函数中, 所以, 本例中相当于是先执行了 c.Next()即注册的匿名函数, 然后回到本函数继续执行. 所以本例的Print的输出顺序是: 
+log.Println(example) 
+log.Print(latency) 
+log.Println(status) 
+如果将c.Next()放在log.Print(latency)后面, 那么log.Println(example)和log.Print(latency)执行的顺序就调换了. 所以一切都取决于c.Next()执行的位置. c.Next()的核心代码如下:
+
+// Next should be used only in the middlewares.
+// It executes the pending handlers in the chain inside the calling handler.
+// See example in github.
+func (c *Context) Next() {
+    c.index++
+    s := int8(len(c.handlers))
+    for ; c.index < s; c.index++ {
+        c.handlers[c.index](c)
+    }
+}
+它其实是执行了后面所有的handlers. 
+关于使用gin.BasicAuth() middleware, 可以直接使用一个router group进行处理, 本质和logger一样.
+
+
+
+<10> 绑定http server
+
+之前所有的测试中, 我们都是使用router.Run(":8888")开始执行监听, 其实还有两种方法:
+
+// 方法二
+http.ListenAndServe(":8888", router)
+
+// 方法三:
+server := &http.Server{
+    Addr:           ":8888",
+    Handler:        router,
+    ReadTimeout:    10 * time.Second,
+    WriteTimeout:   10 * time.Second,
+    MaxHeaderBytes: 1 << 20,
+}
+server.ListenAndServe()
+至此, gin最基本的一些应用都整理完了, 下面就具体看看代码中的一些实现. 有时间再记录吧.
+
+3.参考:
+
+gin-github
+
