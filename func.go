@@ -21,6 +21,7 @@ func main() {
 		return 10
 	}, 5))
 
+	// 这里这个add方法相当于handler方法的一个属性，调用时需要传一个handler方法实例（因为这里的h handler 实际上是个声明而不是定义）
 	fmt.Println(handler.add(func(name string) int {
 		return 10
 	}, "1"))
