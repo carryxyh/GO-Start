@@ -24,4 +24,22 @@ func main() {
 	fmt.Println(handler.add(func(name string) int {
 		return 10
 	}, "1"))
+
+	fmt.Println(filter(isTen, 10))
+	fmt.Println(filter(isNotTen, 10))
+}
+
+type condition func(int) bool
+
+// 这里的isTen可以作为condition的实例来使用 任何一个入参是int 返回是bool的函数都可以
+func isTen(param int) bool {
+	return param == 10
+}
+
+func isNotTen(param int) bool {
+	return param != 10
+}
+
+func filter(c condition, param int) bool {
+	return c(param)
 }
