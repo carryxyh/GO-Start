@@ -60,6 +60,8 @@ func main() {
 	testDynamicValue()
 
 	fmt.Println("/*---------------分割线------------------*/")
+
+	testMethodCall()
 }
 
 /*---------------分割线------------------*/
@@ -140,4 +142,33 @@ func testDynamicValue() {
 	// 这里会报错，严格控制类型
 	// newValue.SetInt(123)
 	fmt.Println("after set is ", newValue)
+}
+
+/*---------------分割线------------------*/
+
+func (u User) ReflectCallFuncHasArgs(name string, age int) {
+	fmt.Println("ReflectCallFuncHasArgs name: ", name, ", age:", age, "and origal User.Name:", u.Name)
+}
+
+func (u User) ReflectCallFuncNoArgs() {
+	fmt.Println("ReflectCallFuncNoArgs")
+}
+
+func testMethodCall() {
+	user := User{1, "ABC", 25}
+
+	// 1. 要通过反射来调用起对应的方法，必须要先通过reflect.ValueOf(interface)来获取到reflect.Value
+	// 得到“反射类型对象”后才能做下一步处理
+	getValue := reflect.ValueOf(user)
+
+	//先看看带有参数的调用方法
+	methodValue := getValue.MethodByName("ReflectCallFuncHasArgs")
+	args := []reflect.Value{reflect.ValueOf("111"), reflect.ValueOf(10)}
+	methodValue.Call(args)
+
+	methodValue = getValue.MethodByName("ReflectCallFuncNoArgs")
+	args = make([]reflect.Value, 0)
+	// 这里也是不行的。无参数必须是数组为0
+	// args = make([]reflect.Value, 1)
+	methodValue.Call(args)
 }
