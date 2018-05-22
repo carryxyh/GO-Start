@@ -35,6 +35,9 @@ func main() {
 	convertPointer := pointer.Interface().(*float64)
 	convertValue := value.Interface().(float64)
 
+	//这里同样输出1.2345
+	fmt.Println("print-----", value.Interface())
+
 	//这两行输出相同的值，convertPointer就相当于&num
 	fmt.Println(convertPointer)
 	fmt.Println(&num)
@@ -42,7 +45,57 @@ func main() {
 	//那么这里理所当然会输出num的值
 	fmt.Println(*convertPointer)
 
-	fmt.Println("------")
+	fmt.Println("/*---------------分割线------------------*/")
 
 	fmt.Println(convertValue)
+
+	/*---------------分割线------------------*/
+
+	testField()
+}
+
+/*---------------分割线------------------*/
+
+type User struct {
+	Id   int
+	Name string
+	Age  int
+}
+
+func (u User) ReflectCallFunc() {
+	fmt.Println("ReflectCallFunc")
+}
+
+func testField() {
+	user := User{1, "ABC", 25}
+
+	getType := reflect.TypeOf(user)
+
+	fmt.Println("getType is", getType.Name())
+
+	getValue := reflect.ValueOf(user)
+
+	fmt.Println("getValue is ", getValue)
+
+	getPointer := reflect.TypeOf(&user)
+
+	//*main.User
+	fmt.Println("getPointer is ", getPointer)
+
+	// 获取方法字段
+	// 1. 先获取interface的reflect.Type，然后通过NumField进行遍历
+	// 2. 再通过reflect.Type的Field获取其Field
+	// 3. 最后通过Field的Interface()得到对应的value
+	for i := 0; i < getType.NumField(); i++ {
+
+		//注意这两条，第一个要获取的是字段类型的相关信息
+		//第二个是获取字段值相关的信息
+		field := getType.Field(i)
+		value := getValue.Field(i).Interface()
+
+		fmt.Printf("%s: %v = %v\n", field.Name, field.Type, value)
+	}
+
+	// 获取方法
+	// 1. 先获取interface的reflect.Type，然后通过.NumMethod进行遍历
 }
