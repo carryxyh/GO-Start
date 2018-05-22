@@ -52,6 +52,14 @@ func main() {
 	/*---------------分割线------------------*/
 
 	testField()
+
+	fmt.Println("/*---------------分割线------------------*/")
+
+	/*---------------分割线------------------*/
+
+	testDynamicValue()
+
+	fmt.Println("/*---------------分割线------------------*/")
 }
 
 /*---------------分割线------------------*/
@@ -98,4 +106,38 @@ func testField() {
 
 	// 获取方法
 	// 1. 先获取interface的reflect.Type，然后通过.NumMethod进行遍历
+	for i := 0; i < getType.NumMethod(); i++ {
+		m := getType.Method(i)
+		fmt.Printf("%s: %v\n", m.Name, m.Type)
+	}
+}
+
+/*---------------分割线------------------*/
+
+func testDynamicValue() {
+	var num float64 = 3.1415
+
+	//reflect.Value是通过reflect.ValueOf(X)获得的
+	//只有当X是指针的时候，才可以通过reflec.Value修改实际变量X的值
+
+	//如果传入的参数不是指针，而是变量，那么
+	// 通过Elem获取原始值对应的对象则直接panic
+	// 通过CanSet方法查询是否可以设置返回false
+	pointer := reflect.ValueOf(&num)
+
+	// reflect.Value.Elem() 表示获取原始值对应的反射对象，只有原始对象才能修改，当前反射对象是不能修改的
+	newValue := pointer.Elem()
+
+	//3.1415
+	fmt.Println("before set is ", newValue)
+
+	// 通过reflect.ValueOf获取num中的reflect.Value，注意，参数必须是指针才能修改其值
+	fmt.Println("type of newValue ", newValue.Type())
+	fmt.Println("settability of pointer:", newValue.CanSet())
+
+	newValue.SetFloat(6.28)
+
+	// 这里会报错，严格控制类型
+	// newValue.SetInt(123)
+	fmt.Println("after set is ", newValue)
 }
