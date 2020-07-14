@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	resultInt := make(chan int, 2)
+	resultInt := make(chan int)
 	// fmt.Println("i am init channel value ", <-resultInt)
 	resultInt <- 123
 
