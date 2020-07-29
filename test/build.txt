@@ -1,0 +1,191 @@
+# _/Users/xiuyuhang/Downloads/go/test
+./funs.go:31:6: cannot inline assembleInputStream: unhandled op RANGE
+./funs.go:41:6: cannot inline assembleOutputStream: unhandled op RANGE
+./funs.go:71:6: cannot inline algOne: unhandled op FOR
+./funs.go:74:26: inlining call to bytes.NewBuffer func([]byte) *bytes.Buffer { return &bytes.Buffer literal }
+./funs.go:84:26: inlining call to io.ReadFull func(io.Reader, []byte) (int, error) { var io..autotmp_4 int; io..autotmp_4 = <N>; var io..autotmp_5 error; io..autotmp_5 = <N>; io..autotmp_4, io..autotmp_5 = io.ReadAtLeast(io.r, io.buf, len(io.buf)); return io..autotmp_4, io..autotmp_5 }
+./funs.go:92:27: inlining call to io.ReadFull func(io.Reader, []byte) (int, error) { var io..autotmp_4 int; io..autotmp_4 = <N>; var io..autotmp_5 error; io..autotmp_5 = <N>; io..autotmp_4, io..autotmp_5 = io.ReadAtLeast(io.r, io.buf, len(io.buf)); return io..autotmp_4, io..autotmp_5 }
+./funs.go:100:19: inlining call to bytes.Compare func([]byte, []byte) int { return bytealg.Compare(bytes.a, bytes.b) }
+./funs.go:104:28: inlining call to io.ReadFull func(io.Reader, []byte) (int, error) { var io..autotmp_4 int; io..autotmp_4 = <N>; var io..autotmp_5 error; io..autotmp_5 = <N>; io..autotmp_4, io..autotmp_5 = io.ReadAtLeast(io.r, io.buf, len(io.buf)); return io..autotmp_4, io..autotmp_5 }
+./funs.go:122:6: cannot inline algTwo: unhandled op FOR
+./funs.go:125:26: inlining call to bytes.NewReader func([]byte) *bytes.Reader { return &bytes.Reader literal }
+./funs.go:136:27: inlining call to bytes.(*Reader).ReadByte method(*bytes.Reader) func() (byte, error) { bytes.r.prevRune = int(-1); if bytes.r.i >= int64(len(bytes.r.s)) { return byte(0), io.EOF }; var bytes.b·4 byte; bytes.b·4 = <N>; bytes.b·4 = bytes.r.s[bytes.r.i]; bytes.r.i++; return bytes.b·4, nil }
+./funs.go:164:20: inlining call to bytes.(*Reader).UnreadByte method(*bytes.Reader) func() error { if bytes.r.i <= int64(0) { return errors.New(string("bytes.Reader.UnreadByte: at beginning of slice")) }; bytes.r.prevRune = int(-1); bytes.r.i--; return nil }
+./funs.go:164:20: inlining call to errors.New func(string) error { return error(&errors.errorString literal) }
+./funs.go:49:6: cannot inline main: function too complex: cost 806 exceeds budget 80
+./funs.go:57:13: inlining call to fmt.Println func(...interface {}) (int, error) { var fmt..autotmp_3 int; fmt..autotmp_3 = <N>; var fmt..autotmp_4 error; fmt..autotmp_4 = <N>; fmt..autotmp_3, fmt..autotmp_4 = fmt.Fprintln(io.Writer(os.Stdout), fmt.a...); return fmt..autotmp_3, fmt..autotmp_4 }
+./funs.go:58:14: inlining call to bytes.(*Buffer).Reset method(*bytes.Buffer) func() { bytes.b.buf = bytes.b.buf[:int(0)]; bytes.b.off = int(0); bytes.b.lastRead = bytes.readOp(0) }
+./funs.go:60:44: inlining call to bytes.(*Buffer).Bytes method(*bytes.Buffer) func() []byte { return bytes.b.buf[bytes.b.off:] }
+./funs.go:60:26: inlining call to bytes.Compare func([]byte, []byte) int { return bytealg.Compare(bytes.a, bytes.b) }
+./funs.go:61:98: inlining call to bytes.(*Buffer).Bytes method(*bytes.Buffer) func() []byte { return bytes.b.buf[bytes.b.off:] }
+./funs.go:61:12: inlining call to fmt.Printf func(string, ...interface {}) (int, error) { var fmt..autotmp_4 int; fmt..autotmp_4 = <N>; var fmt..autotmp_5 error; fmt..autotmp_5 = <N>; fmt..autotmp_4, fmt..autotmp_5 = fmt.Fprintf(io.Writer(os.Stdout), fmt.format, fmt.a...); return fmt..autotmp_4, fmt..autotmp_5 }
+./funs.go:63:13: inlining call to fmt.Println func(...interface {}) (int, error) { var fmt..autotmp_3 int; fmt..autotmp_3 = <N>; var fmt..autotmp_4 error; fmt..autotmp_4 = <N>; fmt..autotmp_3, fmt..autotmp_4 = fmt.Fprintln(io.Writer(os.Stdout), fmt.a...); return fmt..autotmp_3, fmt..autotmp_4 }
+./funs.go:64:14: inlining call to bytes.(*Buffer).Reset method(*bytes.Buffer) func() { bytes.b.buf = bytes.b.buf[:int(0)]; bytes.b.off = int(0); bytes.b.lastRead = bytes.readOp(0) }
+./funs.go:66:43: inlining call to bytes.(*Buffer).Bytes method(*bytes.Buffer) func() []byte { return bytes.b.buf[bytes.b.off:] }
+./funs.go:66:25: inlining call to bytes.Compare func([]byte, []byte) int { return bytealg.Compare(bytes.a, bytes.b) }
+./funs.go:67:98: inlining call to bytes.(*Buffer).Bytes method(*bytes.Buffer) func() []byte { return bytes.b.buf[bytes.b.off:] }
+./funs.go:67:12: inlining call to fmt.Printf func(string, ...interface {}) (int, error) { var fmt..autotmp_4 int; fmt..autotmp_4 = <N>; var fmt..autotmp_5 error; fmt..autotmp_5 = <N>; fmt..autotmp_4, fmt..autotmp_5 = fmt.Fprintf(io.Writer(os.Stdout), fmt.format, fmt.a...); return fmt..autotmp_4, fmt..autotmp_5 }
+./funs.go:80:13: make([]byte, size) escapes to heap:
+./funs.go:80:13:   flow: {heap} = &{storage for make([]byte, size)}:
+./funs.go:80:13:     from make([]byte, size) (non-constant size) at ./funs.go:80:13
+./funs.go:74:26: &bytes.Buffer literal escapes to heap:
+./funs.go:74:26:   flow: ~R0 = &{storage for &bytes.Buffer literal}:
+./funs.go:74:26:     from &bytes.Buffer literal (spill) at ./funs.go:74:26
+./funs.go:74:26:     from ~R0 = <N> (assign-pair) at ./funs.go:74:26
+./funs.go:74:26:   flow: input = ~R0:
+./funs.go:74:26:     from input := (*bytes.Buffer)(~R0) (assign) at ./funs.go:74:8
+./funs.go:74:26:   flow: io.r = input:
+./funs.go:74:26:     from input (interface-converted) at ./funs.go:104:28
+./funs.go:74:26:     from io.r, io.buf = <N> (assign-pair) at ./funs.go:104:28
+./funs.go:74:26:   flow: {heap} = io.r:
+./funs.go:74:26:     from io.ReadAtLeast(io.r, io.buf, len(io.buf)) (call parameter) at ./funs.go:104:28
+./funs.go:71:13: parameter data leaks to {storage for &bytes.Buffer literal} with derefs=0:
+./funs.go:71:13:   flow: bytes.buf = data:
+./funs.go:71:13:     from bytes.buf = <N> (assign-pair) at ./funs.go:74:26
+./funs.go:71:13:   flow: {storage for &bytes.Buffer literal} = bytes.buf:
+./funs.go:71:13:     from bytes.Buffer literal (struct literal element) at ./funs.go:74:26
+./funs.go:71:13: leaking param: data
+./funs.go:71:26: find does not escape
+./funs.go:71:39: repl does not escape
+./funs.go:71:52: output does not escape
+./funs.go:74:26: &bytes.Buffer literal escapes to heap
+./funs.go:80:13: make([]byte, size) escapes to heap
+./funs.go:122:13: data does not escape
+./funs.go:122:26: find does not escape
+./funs.go:122:39: repl does not escape
+./funs.go:122:52: output does not escape
+./funs.go:125:26: &bytes.Reader literal does not escape
+./funs.go:164:20: &errors.errorString literal does not escape
+./funs.go:58:14: main ignoring self-assignment in bytes.b.buf = bytes.b.buf[:int(0)]
+./funs.go:64:14: main ignoring self-assignment in bytes.b.buf = bytes.b.buf[:int(0)]
+./funs.go:67:98: output.Bytes() escapes to heap:
+./funs.go:67:98:   flow: ~arg4 = &{storage for output.Bytes()}:
+./funs.go:67:98:     from output.Bytes() (spill) at ./funs.go:67:98
+./funs.go:67:98:     from fmt.format, ~arg1, ~arg2, ~arg3, ~arg4 = <N> (assign-pair) at ./funs.go:67:12
+./funs.go:67:98:   flow: {storage for []interface {} literal} = ~arg4:
+./funs.go:67:98:     from []interface {} literal (slice-literal-element) at ./funs.go:67:12
+./funs.go:67:98:   flow: fmt.a = &{storage for []interface {} literal}:
+./funs.go:67:98:     from []interface {} literal (spill) at ./funs.go:67:12
+./funs.go:67:98:     from fmt.a = []interface {} literal (assign) at ./funs.go:67:12
+./funs.go:67:98:   flow: {heap} = *fmt.a:
+./funs.go:67:98:     from fmt.Fprintf(io.Writer(os.Stdout), fmt.format, fmt.a...) (call parameter) at ./funs.go:67:12
+./funs.go:67:71: out escapes to heap:
+./funs.go:67:71:   flow: ~arg3 = &{storage for out}:
+./funs.go:67:71:     from out (spill) at ./funs.go:67:71
+./funs.go:67:71:     from fmt.format, ~arg1, ~arg2, ~arg3, ~arg4 = <N> (assign-pair) at ./funs.go:67:12
+./funs.go:67:71:   flow: {storage for []interface {} literal} = ~arg3:
+./funs.go:67:71:     from []interface {} literal (slice-literal-element) at ./funs.go:67:12
+./funs.go:67:71:   flow: fmt.a = &{storage for []interface {} literal}:
+./funs.go:67:71:     from []interface {} literal (spill) at ./funs.go:67:12
+./funs.go:67:71:     from fmt.a = []interface {} literal (assign) at ./funs.go:67:12
+./funs.go:67:71:   flow: {heap} = *fmt.a:
+./funs.go:67:71:     from fmt.Fprintf(io.Writer(os.Stdout), fmt.format, fmt.a...) (call parameter) at ./funs.go:67:12
+./funs.go:67:71: in escapes to heap:
+./funs.go:67:71:   flow: ~arg2 = &{storage for in}:
+./funs.go:67:71:     from in (spill) at ./funs.go:67:71
+./funs.go:67:71:     from fmt.format, ~arg1, ~arg2, ~arg3, ~arg4 = <N> (assign-pair) at ./funs.go:67:12
+./funs.go:67:71:   flow: {storage for []interface {} literal} = ~arg2:
+./funs.go:67:71:     from []interface {} literal (slice-literal-element) at ./funs.go:67:12
+./funs.go:67:71:   flow: fmt.a = &{storage for []interface {} literal}:
+./funs.go:67:71:     from []interface {} literal (spill) at ./funs.go:67:12
+./funs.go:67:71:     from fmt.a = []interface {} literal (assign) at ./funs.go:67:12
+./funs.go:67:71:   flow: {heap} = *fmt.a:
+./funs.go:67:71:     from fmt.Fprintf(io.Writer(os.Stdout), fmt.format, fmt.a...) (call parameter) at ./funs.go:67:12
+./funs.go:67:71: matched == 0 escapes to heap:
+./funs.go:67:71:   flow: ~arg1 = &{storage for matched == 0}:
+./funs.go:67:71:     from matched == 0 (spill) at ./funs.go:67:71
+./funs.go:67:71:     from fmt.format, ~arg1, ~arg2, ~arg3, ~arg4 = <N> (assign-pair) at ./funs.go:67:12
+./funs.go:67:71:   flow: {storage for []interface {} literal} = ~arg1:
+./funs.go:67:71:     from []interface {} literal (slice-literal-element) at ./funs.go:67:12
+./funs.go:67:71:   flow: fmt.a = &{storage for []interface {} literal}:
+./funs.go:67:71:     from []interface {} literal (spill) at ./funs.go:67:12
+./funs.go:67:71:     from fmt.a = []interface {} literal (assign) at ./funs.go:67:12
+./funs.go:67:71:   flow: {heap} = *fmt.a:
+./funs.go:67:71:     from fmt.Fprintf(io.Writer(os.Stdout), fmt.format, fmt.a...) (call parameter) at ./funs.go:67:12
+./funs.go:63:14: "=======================================\nRunning Algorithm Two" escapes to heap:
+./funs.go:63:14:   flow: ~arg0 = &{storage for "=======================================\nRunning Algorithm Two"}:
+./funs.go:63:14:     from "=======================================\nRunning Algorithm Two" (spill) at ./funs.go:63:14
+./funs.go:63:14:     from ~arg0 = <N> (assign-pair) at ./funs.go:63:13
+./funs.go:63:14:   flow: {storage for []interface {} literal} = ~arg0:
+./funs.go:63:14:     from []interface {} literal (slice-literal-element) at ./funs.go:63:13
+./funs.go:63:14:   flow: fmt.a = &{storage for []interface {} literal}:
+./funs.go:63:14:     from []interface {} literal (spill) at ./funs.go:63:13
+./funs.go:63:14:     from fmt.a = []interface {} literal (assign) at ./funs.go:63:13
+./funs.go:63:14:   flow: {heap} = *fmt.a:
+./funs.go:63:14:     from fmt.Fprintln(io.Writer(os.Stdout), fmt.a...) (call parameter) at ./funs.go:63:13
+./funs.go:61:98: output.Bytes() escapes to heap:
+./funs.go:61:98:   flow: ~arg4 = &{storage for output.Bytes()}:
+./funs.go:61:98:     from output.Bytes() (spill) at ./funs.go:61:98
+./funs.go:61:98:     from fmt.format, ~arg1, ~arg2, ~arg3, ~arg4 = <N> (assign-pair) at ./funs.go:61:12
+./funs.go:61:98:   flow: {storage for []interface {} literal} = ~arg4:
+./funs.go:61:98:     from []interface {} literal (slice-literal-element) at ./funs.go:61:12
+./funs.go:61:98:   flow: fmt.a = &{storage for []interface {} literal}:
+./funs.go:61:98:     from []interface {} literal (spill) at ./funs.go:61:12
+./funs.go:61:98:     from fmt.a = []interface {} literal (assign) at ./funs.go:61:12
+./funs.go:61:98:   flow: {heap} = *fmt.a:
+./funs.go:61:98:     from fmt.Fprintf(io.Writer(os.Stdout), fmt.format, fmt.a...) (call parameter) at ./funs.go:61:12
+./funs.go:61:71: out escapes to heap:
+./funs.go:61:71:   flow: ~arg3 = &{storage for out}:
+./funs.go:61:71:     from out (spill) at ./funs.go:61:71
+./funs.go:61:71:     from fmt.format, ~arg1, ~arg2, ~arg3, ~arg4 = <N> (assign-pair) at ./funs.go:61:12
+./funs.go:61:71:   flow: {storage for []interface {} literal} = ~arg3:
+./funs.go:61:71:     from []interface {} literal (slice-literal-element) at ./funs.go:61:12
+./funs.go:61:71:   flow: fmt.a = &{storage for []interface {} literal}:
+./funs.go:61:71:     from []interface {} literal (spill) at ./funs.go:61:12
+./funs.go:61:71:     from fmt.a = []interface {} literal (assign) at ./funs.go:61:12
+./funs.go:61:71:   flow: {heap} = *fmt.a:
+./funs.go:61:71:     from fmt.Fprintf(io.Writer(os.Stdout), fmt.format, fmt.a...) (call parameter) at ./funs.go:61:12
+./funs.go:61:71: in escapes to heap:
+./funs.go:61:71:   flow: ~arg2 = &{storage for in}:
+./funs.go:61:71:     from in (spill) at ./funs.go:61:71
+./funs.go:61:71:     from fmt.format, ~arg1, ~arg2, ~arg3, ~arg4 = <N> (assign-pair) at ./funs.go:61:12
+./funs.go:61:71:   flow: {storage for []interface {} literal} = ~arg2:
+./funs.go:61:71:     from []interface {} literal (slice-literal-element) at ./funs.go:61:12
+./funs.go:61:71:   flow: fmt.a = &{storage for []interface {} literal}:
+./funs.go:61:71:     from []interface {} literal (spill) at ./funs.go:61:12
+./funs.go:61:71:     from fmt.a = []interface {} literal (assign) at ./funs.go:61:12
+./funs.go:61:71:   flow: {heap} = *fmt.a:
+./funs.go:61:71:     from fmt.Fprintf(io.Writer(os.Stdout), fmt.format, fmt.a...) (call parameter) at ./funs.go:61:12
+./funs.go:61:71: matched == 0 escapes to heap:
+./funs.go:61:71:   flow: ~arg1 = &{storage for matched == 0}:
+./funs.go:61:71:     from matched == 0 (spill) at ./funs.go:61:71
+./funs.go:61:71:     from fmt.format, ~arg1, ~arg2, ~arg3, ~arg4 = <N> (assign-pair) at ./funs.go:61:12
+./funs.go:61:71:   flow: {storage for []interface {} literal} = ~arg1:
+./funs.go:61:71:     from []interface {} literal (slice-literal-element) at ./funs.go:61:12
+./funs.go:61:71:   flow: fmt.a = &{storage for []interface {} literal}:
+./funs.go:61:71:     from []interface {} literal (spill) at ./funs.go:61:12
+./funs.go:61:71:     from fmt.a = []interface {} literal (assign) at ./funs.go:61:12
+./funs.go:61:71:   flow: {heap} = *fmt.a:
+./funs.go:61:71:     from fmt.Fprintf(io.Writer(os.Stdout), fmt.format, fmt.a...) (call parameter) at ./funs.go:61:12
+./funs.go:57:14: "=======================================\nRunning Algorithm One" escapes to heap:
+./funs.go:57:14:   flow: ~arg0 = &{storage for "=======================================\nRunning Algorithm One"}:
+./funs.go:57:14:     from "=======================================\nRunning Algorithm One" (spill) at ./funs.go:57:14
+./funs.go:57:14:     from ~arg0 = <N> (assign-pair) at ./funs.go:57:13
+./funs.go:57:14:   flow: {storage for []interface {} literal} = ~arg0:
+./funs.go:57:14:     from []interface {} literal (slice-literal-element) at ./funs.go:57:13
+./funs.go:57:14:   flow: fmt.a = &{storage for []interface {} literal}:
+./funs.go:57:14:     from []interface {} literal (spill) at ./funs.go:57:13
+./funs.go:57:14:     from fmt.a = []interface {} literal (assign) at ./funs.go:57:13
+./funs.go:57:14:   flow: {heap} = *fmt.a:
+./funs.go:57:14:     from fmt.Fprintln(io.Writer(os.Stdout), fmt.a...) (call parameter) at ./funs.go:57:13
+./funs.go:54:16: ([]byte)("elvis") does not escape
+./funs.go:55:16: ([]byte)("Elvis") does not escape
+./funs.go:57:14: "=======================================\nRunning Algorithm One" escapes to heap
+./funs.go:57:13: []interface {} literal does not escape
+./funs.go:61:71: matched == 0 escapes to heap
+./funs.go:61:71: in escapes to heap
+./funs.go:61:71: out escapes to heap
+./funs.go:61:98: output.Bytes() escapes to heap
+./funs.go:61:12: []interface {} literal does not escape
+./funs.go:63:14: "=======================================\nRunning Algorithm Two" escapes to heap
+./funs.go:63:13: []interface {} literal does not escape
+./funs.go:67:71: matched == 0 escapes to heap
+./funs.go:67:71: in escapes to heap
+./funs.go:67:71: out escapes to heap
+./funs.go:67:98: output.Bytes() escapes to heap
+./funs.go:67:12: []interface {} literal does not escape
+<autogenerated>:1: parameter .this leaks to {heap} with derefs=0:
+<autogenerated>:1:   flow: {heap} = .this:
+<autogenerated>:1:     from .this.Error() (call parameter) at <autogenerated>:1
+<autogenerated>:1: leaking param: .this
+<autogenerated>:1: .this does not escape
