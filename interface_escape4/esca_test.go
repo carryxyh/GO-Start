@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -14,14 +13,22 @@ type Cat struct {
 }
 
 //go:noinline
-func (c Cat) Quack() {
-	fmt.Println(c.Name + " meow")
+func (c *Cat) Quack() *Cat {
+	println(c.Name + " meow")
+	return c
+}
+
+//go:noinline
+func Qua(cat *Cat) {
+	cat.Quack()
 }
 
 // go:noinline
 func BenchmarkTestInterface(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		var c Duck = Cat{"grooming"}
-		c.Quack()
+		var c Duck = &Cat{
+			"tom",
+		}
+		Qua(c)
 	}
 }
